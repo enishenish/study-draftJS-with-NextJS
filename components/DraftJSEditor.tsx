@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import {convertToRaw, Editor, EditorState} from 'draft-js';
+import React, { useEffect, useRef, useState } from 'react'
+import {convertToRaw, Editor, EditorState, RichUtils} from 'draft-js';
 import 'draft-js/dist/Draft.css'
 
 const DraftJSEditor = () => {
@@ -7,6 +7,11 @@ const DraftJSEditor = () => {
   const [editorState, setEditorState] = useState(() => 
     EditorState.createEmpty()
   );
+  const editorRef = useRef<Editor>(null)
+
+  useEffect(() => {
+    setEditorEnable(true)
+  }, [])
 
   const handleBoldClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault()
@@ -15,20 +20,16 @@ const DraftJSEditor = () => {
     console.log(selection);
     console.log(content);
     console.log(convertToRaw(content))
-    
-
+    setEditorState(RichUtils.toggleInlineStyle(editorState, "BOLD"))
   }
 
-  useEffect(() => {
-    setEditorEnable(true)
-  }, [])
-
   return (
-    <div>
+    <div onClick={() => {editorRef.current?.focus()}}>
       {editorEnable && (
         <>
-        <button onClick={handleBoldClick}>Bold</button>
+        <button onMouseDown={handleBoldClick}>Bold</button>
         <Editor
+          ref={editorRef}
           placeholder="Write something!"
           editorKey="test-key"
           editorState={editorState}
