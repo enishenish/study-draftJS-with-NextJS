@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import {convertToRaw, Editor, EditorState, RichUtils} from 'draft-js';
 import 'draft-js/dist/Draft.css'
+import StyleControls from './BlockStyleControls';
 
 const DraftJSEditor = () => {
   const [editorEnable, setEditorEnable] = useState(false)
@@ -13,21 +14,19 @@ const DraftJSEditor = () => {
     setEditorEnable(true)
   }, [])
 
-  const handleBoldClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleToggleInlineStyle = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault()
-    const selection = editorState.getSelection()
-    const content = editorState.getCurrentContent()
-    console.log(selection);
-    console.log(content);
-    console.log(convertToRaw(content))
-    setEditorState(RichUtils.toggleInlineStyle(editorState, "BOLD"))
+    const styleString = event.currentTarget.getAttribute('aria-label') as string
+    setEditorState(RichUtils.toggleInlineStyle(editorState, styleString))
   }
+
+  const handlers = {handleToggleInlineStyle, }
 
   return (
     <div onClick={() => {editorRef.current?.focus()}}>
       {editorEnable && (
         <>
-        <button onMouseDown={handleBoldClick}>Bold</button>
+        <StyleControls editorState={editorState} handlers={handlers} />
         <Editor
           ref={editorRef}
           placeholder="Write something!"
